@@ -5,7 +5,10 @@ const resourceName = "u5_sqlite"
 const dbFileName = "db.sqlite"
 const defaultPath = "./resources/" + resourceName
 const dbFilePath = defaultPath + "/db/" + dbFileName
-const filebuffer = fs.readFileSync(dbFilePath);
+const filebuffer = fs.readFileSync(dbFilePath)
+
+const warnTime = 100
+const verbose = true
 
 on("u5_sqlite:js:dbready", async () => {
     console.log("SQLITE DATABSE READY")
@@ -17,6 +20,7 @@ const main = async () => {
     const db = new sql.Database(filebuffer)
 
     function saveDb() {
+        if(verbose) console.log("Saving database")
         const data = db.export()
         const buffer = Buffer.from(data)
         fs.writeFileSync(dbFilePath, buffer)
@@ -26,15 +30,23 @@ const main = async () => {
         const columnsString = columns.map(column => `${column.name} ${column.type} ${column.constrains ?? ""}`).join(',')
         const query = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsString})`
         
+        const time1 = Date.now()
         db.run(query)
+        const time2 = Date.now()
+
         saveDb()
+
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
+        }
     }
 
-    // createTable("users", [
-    //     {name: "id", type: "integer", constrains: "PRIMARY KEY AUTOINCREMENT"},
-    //     {name: "name", type: "string", constrains: "NOT NULL"},
-    //     {name: "age", type: "integer", constrains: "NOT NULL"}
-    // ])
+    createTable("users", [
+        {name: "id", type: "integer", constrains: "PRIMARY KEY AUTOINCREMENT"},
+        {name: "name", type: "string", constrains: "NOT NULL"},
+        {name: "age", type: "integer", constrains: "NOT NULL"}
+    ])
 
     //Create a table called "users" with the columns "id", "name" and "age". The column "id" is the primary key and auto increments, the other columns are not null
 
@@ -55,9 +67,9 @@ const main = async () => {
 
         saveDb()
 
-        if (time2 - time1 > 100) {
-            console.log("Query", query, paramValues)
-            console.log("took " + (time2 - time1) + "ms to execute.")
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query, paramValues)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
     }
 
@@ -65,6 +77,7 @@ const main = async () => {
     //Insert a row in the table "users" with the columns "age" and "name" and the values 23 and "adrian"
 
     function updateRows(tableName, columnsAndValues, where, rawWhere = false) {
+        if(verbose && rawWhere) console.warn("Using rawWhere:", where)
         const columns = Object.keys(columnsAndValues)
         const columnsString = columns.map(column => `${column}=:${column}Val`).join(',')
         const whereColumns = Object.keys(where)
@@ -89,12 +102,15 @@ const main = async () => {
         const query = `UPDATE ${tableName} SET ${columnsString} WHERE (${whereString})`
 
         const time1 = Date.now()
-        !rawWhere ? db.run(query, paramValues) : db.run(query)
+
+        if(rawWhere) db.run(query)
+        else db.run(query, paramValues)
+
         const time2 = Date.now()
         
-        if (time2 - time1 > 100) {
-            console.log("Query", query, paramValues)
-            console.log("took " + (time2 - time1) + "ms to execute.")
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query, paramValues)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
         
         saveDb()
@@ -108,6 +124,7 @@ const main = async () => {
     //In this case 1=1 will always be true so it replaces every entry. Be careful to not give users acces to the condition value if used like this.
 
     function deleteRows(tableName, where, rawWhere = false) {
+        if(verbose && rawWhere) console.warn("Using rawWhere:", where)
         const whereColumns = Object.keys(where)
         const whereString = (
             rawWhere
@@ -125,12 +142,14 @@ const main = async () => {
         const query = `DELETE FROM ${tableName} WHERE (${whereString})`
 
         const time1 = Date.now()
-        !rawWhere ? db.run(query, paramValues) : db.run(query)
+        
+        if(rawWhere) db.run(query)
+        else db.run(query, paramValues) 
         
         const time2 = Date.now()
-        if (time2 - time1 > 100) {
-            console.log("Query", query, values)
-            console.log("took " + (time2 - time1) + "ms to execute.")
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query, paramValues)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
         
         saveDb()
@@ -142,14 +161,15 @@ const main = async () => {
     //As this deletes entries, be very careful when giving users the ability to use this
 
     function executeRawWithParams(query, params) {
+        if(verbose) console.warn("Using raw query with params:", query, params)
         const time1 = Date.now()
 
         db.run(query, params)
         
         const time2 = Date.now()
-        if (time2 - time1 > 100) {
-            console.log("Query", query, values)
-            console.log("took " + (time2 - time1) + "ms to execute.")
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query, values)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
         
         saveDb()
@@ -161,14 +181,15 @@ const main = async () => {
     // but you should still be very careful with it when using user input
 
     function executeRaw(query) {
+        if(verbose) console.warn("Using raw query:", query)
         const time1 = Date.now()
 
         db.run(query)
         
         const time2 = Date.now()
-        if (time2 - time1 > 100) {
-            console.log("Query", query)
-            console.log("took " + (time2 - time1) + "ms to execute.")
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
         
         saveDb()
