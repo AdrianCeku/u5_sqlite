@@ -25,9 +25,18 @@ const main = async () => {
     function createTable(tableName, columns) {
         const columnsString = columns.map(column => `${column.name} ${column.type} ${column.constrains ?? ""}`).join(',')
         const query = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsString})`
+        
         db.run(query)
         saveDb()
     }
+
+    // createTable("users", [
+    //     {name: "id", type: "integer", constrains: "PRIMARY KEY AUTOINCREMENT"},
+    //     {name: "name", type: "string", constrains: "NOT NULL"},
+    //     {name: "age", type: "integer", constrains: "NOT NULL"}
+    // ])
+
+    //Create a table called "users" with the columns "id", "name" and "age". The column "id" is the primary key and auto increments, the other columns are not null
 
     function insertRow(tableName, columnsAndValues) {
         const columns = Object.keys(columnsAndValues)
