@@ -103,8 +103,7 @@ const main = async () => {
 
         const time1 = Date.now()
 
-        if(rawWhere) db.run(query)
-        else db.run(query, paramValues)
+        db.run(query, paramValues)
 
         const time2 = Date.now()
         
@@ -132,7 +131,7 @@ const main = async () => {
                 : whereColumns.map(column => `${column}=:${column}`).join(' AND ')
         )
         const paramValues = (() => {
-            if (rawWhere) return where
+            if (rawWhere) return
             return whereColumns.reduce((acc, column) => {
                 acc[`:${column}`] = where[column]
                 return acc
@@ -148,7 +147,7 @@ const main = async () => {
         
         const time2 = Date.now()
         if (verbose || (time2 - time1 > warnTime)) {
-            console.log("Executing: \n", query, paramValues)
+            console.log("Executing: \n", query, rawWhere ? "" : paramValues)
             console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
         
