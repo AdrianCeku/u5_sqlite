@@ -201,7 +201,6 @@ const main = async () => {
     // DO NOT PASS UNSANITIZED USER INPUT TO THIS FUNCTION AND GENERALLY BE EXTREMELY CAREFUL WITH THIS FUNCTION
 
     function select(tableName, columns, where, rawWhere = false) {
-        console.log("SELECT", tableName, columns, where, rawWhere)
         if(verbose && rawWhere) console.warn("Using rawWhere:", where)
         const columnsString = columns.join(',')
         const whereColumns = Object.keys(where)
@@ -233,16 +232,17 @@ const main = async () => {
         return result
     }
 
-    // for(let i = 0; i < 1; i++) {
-    //     insert("users", {"name": "john", "age": 420})
-    // }
+    // select("users", ["name", "age"], {"id": 1, "age": 69})
+    // Select the columns "name" and "age" from the table "users" where the column "id" is 1 AND "age" is 69
+    // Returns an array of objects with the columns as keys and the values as values
+    // Can aslso use rawWhere like the update and delete functions
 
-    on("u5-sqlite:js:createTable", createTable)
-    on("u5-sqlite:js:insert", insert)
-    on("u5-sqlite:js:update", update)
-    on("u5-sqlite:js:delete", deleteRows)
-    on("u5-sqlite:js:executeRawWithParams", executeRawWithParams)
-    on("u5-sqlite:js:executeRaw", executeRaw)
+    on("u5_sqlite:js:createTable", createTable)
+    on("u5_sqlite:js:insert", insert)
+    on("u5_sqlite:js:update", update)
+    on("u5_sqlite:js:delete", deleteRows)
+    on("u5_sqlite:js:executeRawWithParams", executeRawWithParams)
+    on("u5_sqlite:js:executeRaw", executeRaw)
 
     on("u5_sqlite:js:select", (callbackId, tableName, columns, where, rawWhere) => {
         const result = select(tableName, columns, where, rawWhere)

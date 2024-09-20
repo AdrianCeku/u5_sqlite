@@ -37,6 +37,7 @@ local function getCallbackId()
 end
 
 function formatResponse(response)
+    if not response[1] then return {} end
     response = response[1]
 
     local retVal = {}
@@ -79,4 +80,11 @@ AddEventHandler("u5_sqlite:lua:callbackResult", function(callbackId, response)
     end
 end)
 
+--+--+--+--+--+--+--+ SELECT +--+--+--+--+--+--+--+
+exports("createTable", createTable)
+exports("insert", insert)
+exports("update", update)
+exports("delete", delete)
+exports("executeRawWithParams", executeRawWithParams)
+exports("executeRaw", executeRaw)
 exports("select", selectFromDb)
