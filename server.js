@@ -1,6 +1,5 @@
 const fs = require('fs')
 const initSqlJs = require("./db/sql-wasm.js")
-const { default: exports } = require('three/examples/jsm/libs/tween.module.js')
 
 const resourceName = "u5_sqlite"
 const dbFileName = "db.sqlite"
