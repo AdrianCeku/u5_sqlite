@@ -1,5 +1,6 @@
 const fs = require('fs')
 const initSqlJs = require("./db/sql-wasm.js")
+const { default: exports } = require('three/examples/jsm/libs/tween.module.js')
 
 const resourceName = "u5_sqlite"
 const dbFileName = "db.sqlite"
@@ -14,8 +15,8 @@ on("u5_sqlite:js:dbready", async () => {
     console.log("SQLITE DATABSE READY")
 })
 
+//---------------------------------- MAIN START ----------------------------------\\
 const main = async () => {
-//---------------------------------- ASYNC START ----------------------------------\\
     const sql = await initSqlJs();
     const db = new sql.Database(filebuffer)
 
@@ -200,15 +201,55 @@ const main = async () => {
     // Ideally you would never use this, but sometimes you need very complex queries.
     // DO NOT PASS UNSANITIZED USER INPUT TO THIS FUNCTION AND GENERALLY BE EXTREMELY CAREFUL WITH THIS FUNCTION
 
+    function select(tableName, columns, where, rawWhere = false) {
+        if(verbose && rawWhere) console.warn("Using rawWhere:", where)
+        const columnsString = columns.join(',')
+        const whereColumns = Object.keys(where)
+        const whereString = (
+            rawWhere
+                ? where
+                : whereColumns.map(column => `${column}=:${column}`).join(' AND ')
+        )
+        const paramValues = (() => {
+            if (rawWhere) return where
+            return whereColumns.reduce((acc, column) => {
+                acc[`:${column}`] = where[column]
+                return acc
+            }, {})
+        })()
+
+        const query = `SELECT ${columnsString} FROM ${tableName} WHERE (${whereString})`
+
+        const time1 = Date.now()
+        const result = db.exec(query)
+        const time2 = Date.now()
+
+        if (verbose || (time2 - time1 > warnTime)) {
+            console.log("Executing: \n", query, paramValues)
+            console.log("Took: \n", (time2 - time1) + "ms to execute")
+            console.log("Result: \n", result)
+        }
+
+        return result
+    }
+
     on('onResourceStop', (resource) => {
         if (resource === resourceName) {
             saveDb()
         }
     })
-//---------------------------------- ASYNC START ----------------------------------\\
 }
+//---------------------------------- MAIN END ----------------------------------\\
 
 (async () => {
     await main()
+    exports("createTable", createTable)
+    exports("insertRow", insertRow)
+    exports("updateRows", updateRows)
+    exports("deleteRows", deleteRows)
+    exports("executeRawWithParams", executeRawWithParams)
+    exports("executeRaw", executeRaw)
+    exports("select", select)
+
     emit("u5_sqlite:js:dbready")
 })()
