@@ -11,5 +11,6 @@ version "0.1b"
 lua54 "yes"
 
 server_scripts{
-	"server.js"
+	"server.js",
+	"exports.lua"
 }

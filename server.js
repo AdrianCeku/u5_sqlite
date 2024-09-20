@@ -27,7 +27,7 @@ const main = async () => {
     }
 
     function createTable(tableName, columns) {
-        const columnsString = columns.map(column => `${column.name} ${column.type} ${column.constrains ?? ""}`).join(',')
+        const columnsString = columns.map(column => `${column[0]} ${column[1]} ${column[2] ?? ""}`).join(',')
         const query = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsString})`
         
         const time1 = Date.now()
@@ -43,14 +43,14 @@ const main = async () => {
     }
 
     // createTable("users", [
-    //     {name: "id", type: "integer", constrains: "PRIMARY KEY AUTOINCREMENT"},
-    //     {name: "name", type: "string", constrains: "NOT NULL"},
-    //     {name: "age", type: "integer", constrains: "NOT NULL"}
+    //     {"id","integer","PRIMARY KEY AUTOINCREMENT"},
+    //     {"name","string", "NOT NULL"},
+    //     {"age", "integer", "NOT NULL"}
     // ])
 
     //Create a table called "users" with the columns "id", "name" and "age". The column "id" is the primary key and auto increments, the other columns are not null
 
-    function insertRow(tableName, columnsAndValues) {
+    function insert(tableName, columnsAndValues) {
         const columns = Object.keys(columnsAndValues)
         const columnsString = columns.join(',')
         const valueParams = columns.map(column => `:${column}`).join(',')
@@ -73,10 +73,10 @@ const main = async () => {
         }
     }
 
-    // insertRow("users", {"age": 23, "name": "adrian"}) 
+    // insert("users", {"age": 23, "name": "adrian"}) 
     //Insert a row in the table "users" with the columns "age" and "name" and the values 23 and "adrian"
 
-    function updateRows(tableName, columnsAndValues, where, rawWhere = false) {
+    function update(tableName, columnsAndValues, where, rawWhere = false) {
         if(verbose && rawWhere) console.warn("Using rawWhere:", where)
         const columns = Object.keys(columnsAndValues)
         const columnsString = columns.map(column => `${column}=:${column}Val`).join(',')
@@ -116,10 +116,10 @@ const main = async () => {
         saveDb()
     }
 
-    // updateRows("users", {"name": "johnny", "age": 69}, {"id": 1, "age": 420}) 
+    // update("users", {"name": "johnny", "age": 69}, {"id": 1, "age": 420}) 
     // Replace the column "name" with "johnny" and "age" with 420 where the column "id" is 1 and "age" is 69
     
-    // updateRows("users", {"age": 69, "name": "john"}, "1=1", true)
+    // update("users", {"age": 69, "name": "john"}, "1=1", true)
     //Replace the column "age" with 69 and "name" with "john" but the condition is passed as a string and eveluated as is. 
     //In this case 1=1 will always be true so it replaces every entry. Be careful to not give users acces to the condition value if used like this.
 
@@ -157,7 +157,7 @@ const main = async () => {
 
     // deleteRows("users", {"id": 3, "age": 420})
     // deleteRows("users", "1=1", true)
-    //Delete the row where the column "id" is 1 and "age" is 420. Can be used with rawWhere like the updateRows function. 
+    //Delete the row where the column "id" is 1 and "age" is 420. Can be used with rawWhere like the update function. 
     //As this deletes entries, be very careful when giving users the ability to use this
 
     function executeRawWithParams(query, params) {
@@ -201,6 +201,7 @@ const main = async () => {
     // DO NOT PASS UNSANITIZED USER INPUT TO THIS FUNCTION AND GENERALLY BE EXTREMELY CAREFUL WITH THIS FUNCTION
 
     function select(tableName, columns, where, rawWhere = false) {
+        console.log("SELECT", tableName, columns, where, rawWhere)
         if(verbose && rawWhere) console.warn("Using rawWhere:", where)
         const columnsString = columns.join(',')
         const whereColumns = Object.keys(where)
@@ -210,7 +211,7 @@ const main = async () => {
                 : whereColumns.map(column => `${column}=:${column}`).join(' AND ')
         )
         const paramValues = (() => {
-            if (rawWhere) return where
+            if (rawWhere) return
             return whereColumns.reduce((acc, column) => {
                 acc[`:${column}`] = where[column]
                 return acc
@@ -220,7 +221,7 @@ const main = async () => {
         const query = `SELECT ${columnsString} FROM ${tableName} WHERE (${whereString})`
 
         const time1 = Date.now()
-        const result = db.exec(query)
+        const result = db.exec(query, paramValues)
         const time2 = Date.now()
 
         if (verbose || (time2 - time1 > warnTime)) {
@@ -232,17 +233,21 @@ const main = async () => {
         return result
     }
 
-    for(let i = 0; i < 1; i++) {
-        insertRow("users", {"name": "john", "age": 420})
-    }
+    // for(let i = 0; i < 1; i++) {
+    //     insert("users", {"name": "john", "age": 420})
+    // }
 
-    exports("createTable", createTable)
-    exports("insertRow", insertRow)
-    exports("updateRows", updateRows)
-    exports("deleteRows", deleteRows)
-    exports("executeRawWithParams", executeRawWithParams)
-    exports("executeRaw", executeRaw)
-    exports("select", select)
+    on("u5-sqlite:js:createTable", createTable)
+    on("u5-sqlite:js:insert", insert)
+    on("u5-sqlite:js:update", update)
+    on("u5-sqlite:js:delete", deleteRows)
+    on("u5-sqlite:js:executeRawWithParams", executeRawWithParams)
+    on("u5-sqlite:js:executeRaw", executeRaw)
+
+    on("u5_sqlite:js:select", (callbackId, tableName, columns, where, rawWhere) => {
+        const result = select(tableName, columns, where, rawWhere)
+        emit("u5_sqlite:lua:callbackResult", callbackId, result)
+    })
 
     on('onResourceStop', (resource) => {
         if (resource === resourceName) {
@@ -256,3 +261,5 @@ const main = async () => {
     await main()
     emit("u5_sqlite:js:dbready")
 })()
+
+
