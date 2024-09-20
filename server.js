@@ -42,11 +42,11 @@ const main = async () => {
         }
     }
 
-    createTable("users", [
-        {name: "id", type: "integer", constrains: "PRIMARY KEY AUTOINCREMENT"},
-        {name: "name", type: "string", constrains: "NOT NULL"},
-        {name: "age", type: "integer", constrains: "NOT NULL"}
-    ])
+    // createTable("users", [
+    //     {name: "id", type: "integer", constrains: "PRIMARY KEY AUTOINCREMENT"},
+    //     {name: "name", type: "string", constrains: "NOT NULL"},
+    //     {name: "age", type: "integer", constrains: "NOT NULL"}
+    // ])
 
     //Create a table called "users" with the columns "id", "name" and "age". The column "id" is the primary key and auto increments, the other columns are not null
 
@@ -232,6 +232,18 @@ const main = async () => {
         return result
     }
 
+    for(let i = 0; i < 1; i++) {
+        insertRow("users", {"name": "john", "age": 420})
+    }
+
+    exports("createTable", createTable)
+    exports("insertRow", insertRow)
+    exports("updateRows", updateRows)
+    exports("deleteRows", deleteRows)
+    exports("executeRawWithParams", executeRawWithParams)
+    exports("executeRaw", executeRaw)
+    exports("select", select)
+
     on('onResourceStop', (resource) => {
         if (resource === resourceName) {
             saveDb()
@@ -242,13 +254,5 @@ const main = async () => {
 
 (async () => {
     await main()
-    exports("createTable", createTable)
-    exports("insertRow", insertRow)
-    exports("updateRows", updateRows)
-    exports("deleteRows", deleteRows)
-    exports("executeRawWithParams", executeRawWithParams)
-    exports("executeRaw", executeRaw)
-    exports("select", select)
-
     emit("u5_sqlite:js:dbready")
 })()
