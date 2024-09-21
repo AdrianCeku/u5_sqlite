@@ -9,7 +9,7 @@ Sqlite is very convenient. There is no need to setup a database and establish a 
 
 # Getting started
 - Download the resource and place it inside your resource folder
-- Add ensure u5_sqlite to you cfg
+- Add ``ensure u5_sqlite`` to you cfg
 - Add ``local db = exports["u5_sqlite"]`` to your server script
 - You can now use the exports in your server scripts
 
