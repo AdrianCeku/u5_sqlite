@@ -5,7 +5,7 @@ It provides the user with Lua Exports so you can easily access the sqlite databa
 If you like my work and want to help keep open source alive, please consider donating to my [ko-fi](https://ko-fi.com/adrianceku)❤️
 
 # Why sqlite?
-Sqlite is very convenient. There is no need to setup a database and establish a connection. Your whole database lies inside one single file which can easily be beacked up and transfered
+Sqlite is very convenient. There is no need to setup a database and establish a connection. Your whole database lies inside one single file which can be easily backed up and transfered
 
 # Getting started
 - Download the resource and place it inside your resource folder
