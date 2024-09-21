@@ -1,6 +1,6 @@
 This resource is a standalone fivem wrapper for [sql.js](https://github.com/sql-js/sql.js).
 
-It provides the user with Lua Exports so you can easily acces the sqlite database from your Lua Scripts.
+It provides the user with Lua Exports so you can easily access the sqlite database from your Lua Scripts.
 
 If you like my work and want to help keep open source alive, please consider donating to my [ko-fi](https://ko-fi.com/adrianceku)❤️
 
