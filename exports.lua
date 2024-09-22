@@ -63,7 +63,7 @@ local function selectFromDb(tableName, columns, where, rawWhere)
         resultPromise:resolve(response)
     end
 
-    TriggerEvent("u5_sqlite:js:select", callbackId, tableName, columns, where, rawWhere, callbackId)
+    TriggerEvent("u5_sqlite:js:select", callbackId, tableName, columns, where, rawWhere)
 
     local result = Citizen.Await(resultPromise)
     return formatResponse(result)
