@@ -1,5 +1,3 @@
-local queue = {}
-
 local function createTable(tableName, columns)
     TriggerEvent("u5_sqlite:js:createTable", tableName, columns)
 end
