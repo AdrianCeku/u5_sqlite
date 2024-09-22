@@ -11,7 +11,7 @@ const warnTime = 100
 const verbose = true
 
 on("u5_sqlite:js:dbready", async () => {
-    console.log("SQLITE DATABSE READY")
+    console.log("SQLITE DATABASE READY")
 })
 
 //---------------------------------- MAIN START ----------------------------------\\
