@@ -1,4 +1,3 @@
-local u5_utils = exports["u5_utils"]
 local queue = {}
 
 local function createTable(tableName, columns)
