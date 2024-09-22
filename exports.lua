@@ -74,6 +74,7 @@ AddEventHandler("u5_sqlite:lua:callbackResult", function(callbackId, response)
 
     if callback then
         callback(response)
+        callbacks[callbackId] = nil
     end
 end)
 
