@@ -12,6 +12,7 @@ Sqlite is very convenient. There is no need to setup a database and establish a 
 - Add ``ensure u5_sqlite`` to you cfg
 - Add ``local db = exports["u5_sqlite"]`` to your server script
 - You can now use the exports in your server scripts
+- I also recommend the vscode extension [SQLite3 Editor](https://marketplace.visualstudio.com/items?itemName=yy0931.vscode-sqlite3-editor) for viewing and editing the database manually
 
 # Exports
 ## createTable(tableName, columns)
