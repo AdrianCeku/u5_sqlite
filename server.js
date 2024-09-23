@@ -29,17 +29,18 @@ const main = async () => {
     function createTable(tableName, columns) {
         const columnsString = columns.map(column => `${column[0]} ${column[1]} ${column[2] ?? ""}`).join(',')
         const query = `CREATE TABLE IF NOT EXISTS ${tableName} (${columnsString})`
+        if(verbose) console.log("Executing: \n", query)
         
         const time1 = Date.now()
         db.run(query)
         const time2 = Date.now()
 
-        saveDb()
-
         if (verbose || (time2 - time1 > warnTime)) {
-            console.log("Executing: \n", query)
+            if(!verbose) console.log("Executing: \n", query)
             console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
+
+        saveDb()
     }
 
     // createTable("users", [
@@ -60,17 +61,18 @@ const main = async () => {
         }, {})
 
         const query = `INSERT INTO ${tableName} (${columnsString}) VALUES (${valueParams})`
+        if(verbose) console.log("Executing: \n", query, paramValues)
 
         const time1 = Date.now()
         db.run(query, paramValues)
         const time2 = Date.now()
 
-        saveDb()
-
         if (verbose || (time2 - time1 > warnTime)) {
-            console.log("Executing: \n", query, paramValues)
+            if(!verbose)console.log("Executing: \n", query, paramValues)
             console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
+
+        saveDb()
     }
 
     // insert("users", {"age": 23, "name": "adrian"}) 
@@ -100,18 +102,17 @@ const main = async () => {
         })()
 
         const query = `UPDATE ${tableName} SET ${columnsString} WHERE (${whereString})`
+        if(verbose) console.log("Executing: \n", query, paramValues)
 
         const time1 = Date.now()
-
         db.run(query, paramValues)
-
         const time2 = Date.now()
-        
+
         if (verbose || (time2 - time1 > warnTime)) {
-            console.log("Executing: \n", query, paramValues)
+            if(!verbose)console.log("Executing: \n", query, paramValues)
             console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
-        
+
         saveDb()
     }
 
@@ -139,18 +140,18 @@ const main = async () => {
         })()
         
         const query = `DELETE FROM ${tableName} WHERE (${whereString})`
+        if(verbose) console.log("Executing: \n", query, paramValues)
 
         const time1 = Date.now()
-        
         if(rawWhere) db.run(query)
         else db.run(query, paramValues) 
-        
         const time2 = Date.now()
+
         if (verbose || (time2 - time1 > warnTime)) {
-            console.log("Executing: \n", query, rawWhere ? "" : paramValues)
+            if(!verbose)console.log("Executing: \n", query, rawWhere ? "" : paramValues)
             console.log("Took: \n", (time2 - time1) + "ms to execute")
         }
-        
+
         saveDb()
     }
 
@@ -162,7 +163,7 @@ const main = async () => {
     function executeRawWithParams(query, params) {
         if(verbose) console.warn("Using raw query with params:", query, params)
         const time1 = Date.now()
-
+        
         db.run(query, params)
         
         const time2 = Date.now()
@@ -217,13 +218,13 @@ const main = async () => {
         })()
 
         const query = `SELECT ${columnsString} FROM ${tableName} WHERE (${whereString})`
+        if(verbose) console.log("Executing: \n", query, paramValues)
 
         const time1 = Date.now()
         const result = db.exec(query, paramValues)
         const time2 = Date.now()
 
         if (verbose || (time2 - time1 > warnTime)) {
-            console.log("Executing: \n", query, paramValues)
             console.log("Took: \n", (time2 - time1) + "ms to execute")
             console.log("Result: \n", result)
         }
