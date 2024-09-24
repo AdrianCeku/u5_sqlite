@@ -81,22 +81,22 @@ const main = async () => {
     function update(tableName, columnsAndValues, where, rawWhere = false) {
         if(verbose && rawWhere) console.warn("Using rawWhere:", where)
         const columns = Object.keys(columnsAndValues)
-        const columnsString = columns.map(column => `${column}=:${column}Val`).join(',')
+        const columnsString = columns.map(column => `${column}=:${column}_val`).join(',')
         const whereColumns = Object.keys(where)
         const whereString = (
             rawWhere 
             ? where 
-            : whereColumns.map(column => `${column}=:${column}If`).join(' AND ')
+            : whereColumns.map(column => `${column}=:${column}_if`).join(' AND ')
         )
         const paramValues = (() => {
             const params = columns.reduce((acc, column) => {
-                acc[":" + column + "Val"] = columnsAndValues[column]
+                acc[":" + column + "_val"] = columnsAndValues[column]
                 return acc
             }, {})
             if (rawWhere) return params
 
             return whereColumns.reduce((acc, column) => {
-                acc[`:${column}If`] = where[column]
+                acc[`:${column}_if`] = where[column]
                 return acc
             }, params)
         })()
